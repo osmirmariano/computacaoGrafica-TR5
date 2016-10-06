@@ -12,6 +12,7 @@ TForm3 *Form3;
 __fastcall TForm3::TForm3(TComponent* Owner)
 	: TForm(Owner)
 {
+	Form3->Color = clWhite;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm3::SpeedButton3Click(TObject *Sender)
@@ -41,92 +42,86 @@ int TForm3::CalcularCor(RGBTRIPLE* pixel){
 }
 void __fastcall TForm3::SpeedButton1Click(TObject *Sender)
 {
-	Graphics::TBitmap * copia = new Graphics::TBitmap();
-	copia->LoadFromFile("cg.bmp");
-	 RGBTRIPLE *r;
-	 int tb, tt;
-	 for (int y = 0; y < Image1->Height; y++) {
-				r = (RGBTRIPLE*)copia->ScanLine[y];
-				for (int x = 0; x < Image1->Width; x++) {
-				tt = CalcularCor(r);
-				tt =tt+(tb);
-				if (tt>255){tt= 255;}
-				if (tt<0){tt=0;}
-				r->rgbtRed = tt;
-				r->rgbtGreen = tt;
-				r->rgbtBlue = tt;
-				r++;
-				}
-			 }
-
-
-			 for(int j = 1; j < H-2; j++)
-			  {
-			  r = (RGBTRIPLE*)copia->ScanLine[j];
-			for(int i = 1; i < W-2; i++)
-			 {
-
-				float xDirection = 2*GetRValue(Image1->Canvas->Pixels[i-1][j]) - 2*GetRValue(Image1->Canvas->Pixels[i+1][j]) + GetRValue(Image1->Canvas->Pixels[i-1][j+1])
-						  - GetRValue(Image1->Canvas->Pixels[i+1][j+1]) - GetRValue(Image1->Canvas->Pixels[i+1][j-1]) + GetRValue(Image1->Canvas->Pixels[i-1][j-1]);
-
-				xDirection = xDirection / 4;
-
-				float yDirection = 2*GetRValue(Image1->Canvas->Pixels[i][j+1]) - 2*GetRValue(Image1->Canvas->Pixels[i][j-1]) + GetRValue(Image1->Canvas->Pixels[i-1][j+1]) +
-						  GetRValue(Image1->Canvas->Pixels[i+1][j+1]) - GetRValue(Image1->Canvas->Pixels[i+1][j-1]) - GetRValue(Image1->Canvas->Pixels[i-1][j-1]);
-
-				yDirection = yDirection / 4;
-
-
-				//Obtém a magnitude do gradiente.
-				float gradientValue = sqrt(pow(xDirection, 2) + pow(yDirection, 2));
-
-				r->rgbtRed = gradientValue;
-				r->rgbtGreen = gradientValue;
-				r->rgbtBlue = gradientValue;
-				r++;
+	Graphics::TBitmap *passaAltas = new Graphics::TBitmap();
+	passaAltas->LoadFromFile("cg.bmp");
+	RGBTRIPLE *r;
+	int luminosidade, posicao;
+	float valor1, valor2;
+	for (int y = 0; y < Image1->Height; y++) {
+		r = (RGBTRIPLE*)passaAltas->ScanLine[y];
+		for (int x = 0; x < Image1->Width; x++) {
+			luminosidade = CalcularCor(r);
+			luminosidade = luminosidade + posicao;
+			if (luminosidade > 255){
+				luminosidade = 255;
 			}
+			if (luminosidade < 0){
+				luminosidade = 0;
+			}
+			r->rgbtRed = luminosidade;
+			r->rgbtGreen = luminosidade;
+			r->rgbtBlue = luminosidade;
+			r++;
 		}
-		Image1->Picture->Assign(copia);
+	}
+	for(int j = 0; j < Image1->Height; j++){
+		r = (RGBTRIPLE*)passaAltas->ScanLine[j];   //Scanline retorna memoria do Bitmap
+		for(int i = 0; i < Image1->Width; i++){
+			//r = abs(r*3-c1-c2-c3)/4
+			valor1 = GetRValue(Image1->Canvas->Pixels[i-1][j]) - GetRValue(Image1->Canvas->Pixels[i+1][j]) - GetRValue(Image1->Canvas->Pixels[i-1][j+1])
+			- GetRValue(Image1->Canvas->Pixels[i+1][j+1]) - GetRValue(Image1->Canvas->Pixels[i+1][j-1]) - GetRValue(Image1->Canvas->Pixels[i-1][j-1]);
+			valor1 = valor1/4;
+
+			valor2 = GetRValue(Image1->Canvas->Pixels[i][j+1]) - GetRValue(Image1->Canvas->Pixels[i][j-1]) - GetRValue(Image1->Canvas->Pixels[i-1][j+1]) -
+			GetRValue(Image1->Canvas->Pixels[i+1][j+1]) - GetRValue(Image1->Canvas->Pixels[i+1][j-1]) - GetRValue(Image1->Canvas->Pixels[i-1][j-1]);
+			valor2 = valor2/4;
+
+			//Obtém a magnitude do gradiente.
+			float valorGradiente = sqrt(pow(valor1, 2) + pow(valor2, 2));
+
+			r->rgbtRed = valorGradiente;
+			r->rgbtGreen = valorGradiente;
+			r->rgbtBlue = valorGradiente;
+			r++;
+		}
+	}
+	Image1->Picture->Assign(passaAltas);
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm3::SpeedButton2Click(TObject *Sender)
 {
-	Graphics::TBitmap * copia = new Graphics::TBitmap();
-	//copia->Assign(pict);
-	copia->LoadFromFile("cg.bmp");
-	RGBTRIPLE *r;
-	int H = Image1->Height, W = Image1->Width, tb, tt;
+	Graphics::TBitmap *passaBaixa = new Graphics::TBitmap();
+	passaBaixa->LoadFromFile("cg.bmp");
+	RGBTRIPLE *resultado;
+	int vermelho, verde, azul;
 
-	for(int j = 1; j < H-2; j++)
+	for(int j = 0; j < Image1->Height; j++)
 	{
-		r = (RGBTRIPLE*)copia->ScanLine[j];
-		for(int i = 1; i < W-2; i++)
+		resultado = (RGBTRIPLE*)passaBaixa->ScanLine[j];
+		for(int i = 0; i < Image1->Width; i++)
 		{
-			int red = 4*GetRValue(Image1->Canvas->Pixels[i][j])+
-					  2*(GetRValue(Image1->Canvas->Pixels[i][j-1])+ GetRValue(Image1->Canvas->Pixels[i][j+1])+ GetRValue(Image1->Canvas->Pixels[i-1][j])+ GetRValue(Image1->Canvas->Pixels[i+1][j]))+
-					  1*(GetRValue(Image1->Canvas->Pixels[i-1][j+1])+ GetRValue(Image1->Canvas->Pixels[i+1][j+1])+ GetRValue(Image1->Canvas->Pixels[i+1][j-1]) + GetRValue(Image1->Canvas->Pixels[i-1][j-1]));
+			vermelho = GetRValue(Image1->Canvas->Pixels[i][j]) + GetRValue(Image1->Canvas->Pixels[i][j-1]) + GetRValue(Image1->Canvas->Pixels[i][j+1]) +
+					   GetRValue(Image1->Canvas->Pixels[i-1][j]) + GetRValue(Image1->Canvas->Pixels[i+1][j]) + GetRValue(Image1->Canvas->Pixels[i-1][j+1]) +
+					   GetRValue(Image1->Canvas->Pixels[i+1][j+1]) + GetRValue(Image1->Canvas->Pixels[i+1][j-1]) + GetRValue(Image1->Canvas->Pixels[i-1][j-1]);
+			vermelho = (int)(vermelho/9);
 
-			red = (int)(red/16);
+			verde = GetGValue(Image1->Canvas->Pixels[i][j])+ GetGValue(Image1->Canvas->Pixels[i][j-1]) + GetGValue(Image1->Canvas->Pixels[i][j+1])+
+					GetGValue(Image1->Canvas->Pixels[i-1][j])+ GetGValue(Image1->Canvas->Pixels[i+1][j]) + GetGValue(Image1->Canvas->Pixels[i-1][j+1])+
+					GetGValue(Image1->Canvas->Pixels[i+1][j+1])+ GetGValue(Image1->Canvas->Pixels[i+1][j-1]) + GetGValue(Image1->Canvas->Pixels[i-1][j-1]);
+			verde = (int)(verde/9);
 
-			int green = 4*GetGValue(Image1->Canvas->Pixels[i][j])+
-					  2*( GetGValue(Image1->Canvas->Pixels[i][j-1])+ GetGValue(Image1->Canvas->Pixels[i][j+1])+ GetGValue(Image1->Canvas->Pixels[i-1][j])+ GetGValue(Image1->Canvas->Pixels[i+1][j])) +
-					  1*( GetGValue(Image1->Canvas->Pixels[i-1][j+1])+ GetGValue(Image1->Canvas->Pixels[i+1][j+1])+ GetGValue(Image1->Canvas->Pixels[i+1][j-1])+ GetGValue(Image1->Canvas->Pixels[i-1][j-1]));
+			azul = GetBValue(Image1->Canvas->Pixels[i][j])+ GetBValue(Image1->Canvas->Pixels[i][j-1]) + GetBValue(Image1->Canvas->Pixels[i][j+1])+
+				   GetBValue(Image1->Canvas->Pixels[i-1][j])+ GetBValue(Image1->Canvas->Pixels[i+1][j]) + GetBValue(Image1->Canvas->Pixels[i-1][j+1])+
+				   GetBValue(Image1->Canvas->Pixels[i+1][j+1])+ GetBValue(Image1->Canvas->Pixels[i+1][j-1]) + GetBValue(Image1->Canvas->Pixels[i-1][j-1]);
+			azul = (int)(azul/9);
 
-			green = (int)(green/16);
-
-			int blue = 4*GetBValue(Image1->Canvas->Pixels[i][j])+
-					  2*( GetBValue(Image1->Canvas->Pixels[i][j-1])+ GetBValue(Image1->Canvas->Pixels[i][j+1])+ GetBValue(Image1->Canvas->Pixels[i-1][j])+ GetBValue(Image1->Canvas->Pixels[i+1][j])) +
-					  1*( GetBValue(Image1->Canvas->Pixels[i-1][j+1])+ GetBValue(Image1->Canvas->Pixels[i+1][j+1])+ GetBValue(Image1->Canvas->Pixels[i+1][j-1])+ GetBValue(Image1->Canvas->Pixels[i-1][j-1]));
-
-			blue = (int)(blue/16);
-
-			r->rgbtRed = red;
-			r->rgbtGreen = green;
-			r->rgbtBlue = blue;
-			r++;
-
+			resultado->rgbtRed = vermelho;
+			resultado->rgbtGreen = verde;
+			resultado->rgbtBlue = azul;
+			resultado++;
 		}
 	}
-	Image1->Picture->Assign(copia);
+
+	Image1->Picture->Assign(passaBaixa);  //Atribui a cópia da imagem
 }
 //---------------------------------------------------------------------------
