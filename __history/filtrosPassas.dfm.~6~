@@ -1496,7 +1496,7 @@ object Form3: TForm3
   end
   object Label15: TLabel
     Left = 27
-    Top = 471
+    Top = 467
     Width = 136
     Height = 14
     Caption = 'PROF. TANILSON DIAS'
@@ -1509,7 +1509,7 @@ object Form3: TForm3
   end
   object Label16: TLabel
     Left = 17
-    Top = 451
+    Top = 447
     Width = 155
     Height = 14
     Caption = 'ALUNO: OSMIR MARIANO'
@@ -1521,8 +1521,8 @@ object Form3: TForm3
     ParentFont = False
   end
   object Label17: TLabel
-    Left = 56
-    Top = 491
+    Left = 48
+    Top = 487
     Width = 87
     Height = 14
     Caption = 'TRABALHO 05'
